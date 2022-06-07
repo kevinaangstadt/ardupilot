@@ -5,6 +5,8 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_DAL/AP_DAL.h>
 
+#include<iostream>
+
 /********************************************************
 *              OPT FLOW AND RANGE FINDER                *
 ********************************************************/
@@ -396,12 +398,20 @@ void NavEKF3_core::readIMUData()
         accel_active = ins.get_primary_accel();
     }
 
+    std::cout << "we got here1" << std::endl;
+
+
+    
     if (ins.use_gyro(imu_index)) {
         gyro_active = imu_index;
     } else {
         gyro_active = ins.get_primary_gyro();
     }
 
+        std::cout << "we got here2" << std::endl;
+
+
+    
     if (gyro_active != gyro_index_active) {
         // we are switching active gyro at runtime. Copy over the
         // bias we have learned from the previously inactive
@@ -410,6 +420,11 @@ void NavEKF3_core::readIMUData()
         stateStruct.gyro_bias = inactiveBias[gyro_active].gyro_bias;
         gyro_index_active = gyro_active;
     }
+
+        std::cout << "we got here3" << std::endl;
+
+
+    
 
     if (accel_active != accel_index_active) {
         // switch to the learned accel bias for this IMU
@@ -434,6 +449,11 @@ void NavEKF3_core::readIMUData()
 
     // Get current time stamp
     imuDataNew.time_ms = imuSampleTime_ms;
+
+        std::cout << "we got here4" << std::endl;
+
+
+    
 
     // Accumulate the measurement time interval for the delta velocity and angle data
     imuDataDownSampledNew.delAngDT += imuDataNew.delAngDT;
@@ -460,6 +480,12 @@ void NavEKF3_core::readIMUData()
     // Keep track of the number of IMU frames since the last state prediction
     framesSincePredict++;
 
+    
+    std::cout << "we got here6" << std::endl;
+
+
+    
+
     /*
      * If the target EKF time step has been accumulated, and the frontend has allowed start of a new predict cycle,
      * then store the accumulated IMU data to be used by the state prediction, ignoring the frontend permission if more
@@ -469,14 +495,23 @@ void NavEKF3_core::readIMUData()
     if ((imuDataDownSampledNew.delAngDT >= (EKF_TARGET_DT-(dtIMUavg*0.5f)) && startPredictEnabled) ||
         (imuDataDownSampledNew.delAngDT >= 2.0f*EKF_TARGET_DT)) {
 
+
+        std::cout << "we got here7a" << std::endl;
+
+        // FOUND IT
+
         // convert the accumulated quaternion to an equivalent delta angle
         imuQuatDownSampleNew.to_axis_angle(imuDataDownSampledNew.delAng);
+
+        std::cout << "we got here9" << std::endl;
 
         // Time stamp the data
         imuDataDownSampledNew.time_ms = imuSampleTime_ms;
 
         // Write data to the FIFO IMU buffer
         storedIMU.push_youngest_element(imuDataDownSampledNew);
+
+        std::cout << "we got here8" << std::endl;
 
         // calculate the achieved average time step rate for the EKF using a combination spike and LPF
         float dtNow = constrain_float(0.5f*(imuDataDownSampledNew.delAngDT+imuDataDownSampledNew.delVelDT),0.5f * dtEkfAvg, 2.0f * dtEkfAvg);
@@ -492,6 +527,13 @@ void NavEKF3_core::readIMUData()
         imuDataDownSampledNew.delVelDT = 0.0f;
         imuQuatDownSampleNew[0] = 1.0f;
         imuQuatDownSampleNew[3] = imuQuatDownSampleNew[2] = imuQuatDownSampleNew[1] = 0.0f;
+
+
+    std::cout << "we got here7" << std::endl;
+
+
+    
+
 
         // reset the counter used to let the frontend know how many frames have elapsed since we started a new update cycle
         framesSincePredict = 0;
@@ -518,7 +560,16 @@ void NavEKF3_core::readIMUData()
     } else {
         // we don't have new IMU data in the buffer so don't run filter updates on this time step
         runUpdates = false;
+
+
+        std::cout << "we got here7b" << std::endl;
     }
+
+    std::cout << "we got here5" << std::endl;
+
+
+    
+
 }
 
 // read the delta velocity and corresponding time interval from the IMU

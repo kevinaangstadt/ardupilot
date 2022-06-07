@@ -7,6 +7,10 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_DAL/AP_DAL.h>
 
+// DEBUG
+extern const AP_HAL::HAL& hal;
+
+
 // constructor
 NavEKF3_core::NavEKF3_core(NavEKF3 *_frontend) :
     frontend(_frontend),
@@ -24,6 +28,9 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     accel_index_active = imu_index;
     core_index = _core_index;
 
+
+   
+
     /*
       The imu_buffer_length needs to cope with the worst case sensor delay at the
       target EKF state prediction rate. Non-IMU data coming in faster is downsampled.
@@ -36,6 +43,16 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     } else {
         return false;
     }
+
+
+    // DEBUG
+    float tmp [] = {0.9987490177154541, -0.00011210364755243063, 0.0008885464048944414, -0.049996279180049896, -0.01660124398767948, 0.019848234951496124, 0.10715515911579132, -0.008682076819241047, 0.0104275643825531, 0.19717849791049957, 5.607244929706212e-06, 7.22184449841734e-06, -3.996879604528658e-05, -0.00010026794916484505, -0.00034329251502640545, -0.0009696076740510762, 0.22252412140369415, 0.04687904193997383, -0.5385611653327942, 0.0, 0.0, 0.0, 0.0, 0.0};
+    for(int i = 0; i < 24; ++i) {
+        statesArray[i] = tmp[i];
+    }
+    return true;
+
+
 
     // find the maximum time delay for all potential sensors
     uint16_t maxTimeDelay_ms = MAX(frontend->_hgtDelay_ms ,
@@ -467,6 +484,12 @@ after the tilt has stabilised.
 
 bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
+
+    // DEBUG
+    // return false;
+
+
+
     // update sensor selection (for affinity)
     update_sensor_selection();
 
@@ -2051,3 +2074,48 @@ void NavEKF3_core::verifyTiltErrorVariance()
     }
 }
 #endif
+
+// DEBUG - dump statesArray to the console
+void NavEKF3_core::dump_core(const GCS_MAVLINK& link, int32_t human_readable)
+{
+    const mavlink_channel_t chan = link.get_chan();
+
+    if (human_readable) {
+        // Vector24
+        for (int j = 0; j < 24; ++j) {
+            hal.console->printf("%f " , statesArray[j]);
+        }
+    } else {
+        union
+        {
+            float input;
+            int32_t output;
+        } data;
+        float *data_tmp = new float[58];
+        memcpy(data_tmp, statesArray, sizeof(float)*24);
+        hal.console->printf("%f" , data_tmp[0]);
+        hal.console->printf("%f" , statesArray[0]);
+	mavlink_msg_debug_float_array_send(chan,10,"datadatad", 0, data_tmp);
+        delete[] data_tmp;
+        for (int j = 0; j < 24; ++j) {
+            data.input = statesArray[j];
+	    // GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "%d", data.output );
+            
+            for (size_t part = 0; part < sizeof(float); ++part){
+                hal.console->printf("%c" , data.output >> part);
+            }
+        }
+        
+    }
+    hal.console->printf("\n");
+}
+
+void NavEKF3_core::write_core(float data[24]) 
+{
+    for(int i = 0; i < 24; i++){
+        statesArray[i] = data[i];
+        hal.console->printf("%f ", statesArray[i]);
+    }
+    statesInitialised = true;
+    hal.console->printf("\n");
+}

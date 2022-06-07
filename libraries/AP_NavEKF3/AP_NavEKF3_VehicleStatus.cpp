@@ -292,6 +292,13 @@ void NavEKF3_core::calcGpsGoodForFlight(void)
 // Detect if we are in flight or on ground
 void NavEKF3_core::detectFlight()
 {
+
+    // DEBUG
+    inFlight = true;
+    onGround = false;
+    return;
+
+
     /*
         If we are a fly forward type vehicle (eg plane), then in-air status can be determined through a combination of speed and height criteria.
         Because of the differing certainty requirements of algorithms that need the in-flight / on-ground status we use two booleans where

@@ -10,6 +10,10 @@
 
 #include <new>
 
+// DEBUG
+extern const AP_HAL::HAL& hal;
+
+
 /*
   parameter defaults for different types of vehicle. The
   APM_BUILD_DIRECTORY is taken from the main vehicle directory name
@@ -816,6 +820,8 @@ bool NavEKF3::InitialiseFilter(void)
     memset(&yaw_reset_data, 0, sizeof(yaw_reset_data));
     memset((void *)&pos_reset_data, 0, sizeof(pos_reset_data));
     memset(&pos_down_reset_data, 0, sizeof(pos_down_reset_data));
+
+    hal.console->printf("EKF Initialized: %d \n", ret);
 
     return ret;
 }
@@ -2044,4 +2050,24 @@ void NavEKF3::writeDefaultAirSpeed(float airspeed)
             core[i].writeDefaultAirSpeed(airspeed);
         }
     }
+}
+
+// DEBUG - dump stateStruct data to the console
+void NavEKF3::dump_data(const GCS_MAVLINK& link, int32_t human_readable)
+{
+    hal.console->printf("dump: \n");
+    const mavlink_channel_t chan = link.get_chan();
+    mavlink_msg_debug_vect_send(chan, "datadatad", 0, num_cores, 0, 0);
+    for(int i = 0; i < num_cores; ++i) {
+        NavEKF3_core &currCore = core[i];
+        hal.console->printf("%d\n", i);
+        currCore.dump_core(link, human_readable);
+    }
+}
+
+// DEBUG - insert new statesArray data into core
+void NavEKF3::write_core(int id, float data[24])
+{
+    hal.console->printf("%d\n", id);
+    core[id].write_core(data);
 }

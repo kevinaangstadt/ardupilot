@@ -48,6 +48,8 @@ private:
     void handle_set_position_target_global_int(const mavlink_message_t &msg);
     void handle_hil_state(const mavlink_message_t &msg);
     void handle_radio(const mavlink_message_t &msg);
+    // DEBUG
+    void handle_debug_float_array(const mavlink_message_t &msg);
 
     void packetReceived(const mavlink_status_t &status, const mavlink_message_t &msg) override;
 

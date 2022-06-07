@@ -678,6 +678,20 @@ MAV_RESULT GCS_MAVLINK_Rover::handle_command_long_packet(const mavlink_command_l
                                               static_cast<int16_t>(packet.param3),
                                               packet.param4);
 
+    // DEBUG
+    case MAV_CMD_REQUEST_MESSAGE:
+    {
+        // param1 : Message ID
+        int32_t param = static_cast<int32_t>(packet.param1);
+        int32_t human_readable = static_cast<int32_t>(packet.param2);
+        if (param == 5000000) {
+            // FIXME 
+            // no longer get_NavEKF3_const()
+            rover.ahrs.get_NavEKF3().dump_data(*this, human_readable);
+        }
+        return MAV_RESULT_ACCEPTED;
+    }
+
     default:
         return GCS_MAVLINK::handle_command_long_packet(packet);
     }
@@ -772,10 +786,35 @@ void GCS_MAVLINK_Rover::handleMessage(const mavlink_message_t &msg)
         handle_radio(msg);
         break;
 
+    // DEBUG
+    case MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY:
+        handle_debug_float_array(msg);
+        break;
+
     default:
         handle_common_message(msg);
         break;
     }
+}
+
+//DEBUG
+void GCS_MAVLINK_Rover::handle_debug_float_array(const mavlink_message_t &msg)
+{
+    mavlink_debug_float_array_t packet;
+    mavlink_msg_debug_float_array_decode(&msg, &packet);
+
+    int32_t id = packet.array_id;
+    //float* data[58] = {packet.data}; // I don't get pointers
+
+    float statesArray[24];
+
+    for(int i = 0; i < 24; i++) {
+        statesArray[i] = packet.data[i]; // I still don't get pointers...
+    }
+
+    rover.ahrs.get_NavEKF3().write_core(id, statesArray);
+
+    hal.console->printf("YAY!\n");
 }
 
 void GCS_MAVLINK_Rover::handle_manual_control(const mavlink_message_t &msg)

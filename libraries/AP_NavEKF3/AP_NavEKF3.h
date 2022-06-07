@@ -27,6 +27,7 @@
 #include <AP_NavEKF/AP_NavEKF_Source.h>
 
 class NavEKF3_core;
+class GCS_MAVLINK;
 
 class NavEKF3 {
     friend class NavEKF3_core;
@@ -391,6 +392,12 @@ public:
 
     // parameter conversion
     void convert_parameters();
+
+    // DEBUG - dump stateStruct data to the console
+    void dump_data(const GCS_MAVLINK&, int32_t);
+
+    // DEBUG - insert new statesArray data into core
+    void write_core(int id, float[24]);
 
 private:
     uint8_t num_cores; // number of allocated cores
