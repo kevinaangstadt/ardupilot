@@ -8,6 +8,9 @@
 #include <string.h>
 #include <AP_InternalError/AP_InternalError.h>
 
+// DEBUG
+#include<iostream>
+
 // constructor
 ekf_ring_buffer::ekf_ring_buffer(uint8_t _elsize) :
     elsize(_elsize)
@@ -165,10 +168,14 @@ bool ekf_imu_buffer::init(uint32_t size)
 */
 void ekf_imu_buffer::push_youngest_element(const void *element)
 {
+    //std::cout << "we got here_sanity" << std::endl;
     if (!buffer) {
+        //std::cout << "we got here11" << std::endl;
+        // DEBUG THIS IS WHERE IT BREAKS -> not any more
         INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
         return;
     }
+    
     // push youngest to the buffer
     _youngest = (_youngest+1) % _size;
     memcpy(get_offset(_youngest), element, elsize);

@@ -417,11 +417,30 @@ public:
 
     void Log_Write(uint64_t time_us);
 
+    // DEBUG - dump covarience matrix to the console and send via mavlink
+    void dump_covarience(const GCS_MAVLINK&);
+
     // DEBUG - dump statesArray to the console and send via mavlink
     void dump_core(const GCS_MAVLINK&, int32_t);
 
     // DEBUG - insert new statesArray data into core
     void write_core(float[24]);
+
+    // DEBUG
+    bool covarienceTransplanted;
+
+    // DEBUG
+    // transplant the covariance matrix
+    void CovarianceTransplant();
+
+    // DEBUG
+    void CoreStateTransplant();
+
+    // DEBUG
+    uint8_t ID;
+
+    //DEBUG
+    void DumpCovarianceCore();
 
 private:
     EKFGSF_yaw *yawEstimator;

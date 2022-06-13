@@ -398,7 +398,7 @@ void NavEKF3_core::readIMUData()
         accel_active = ins.get_primary_accel();
     }
 
-    std::cout << "we got here1" << std::endl;
+    //std::cout << "we got here1" << std::endl;
 
 
     
@@ -408,7 +408,7 @@ void NavEKF3_core::readIMUData()
         gyro_active = ins.get_primary_gyro();
     }
 
-        std::cout << "we got here2" << std::endl;
+        //std::cout << "we got here2" << std::endl;
 
 
     
@@ -421,7 +421,7 @@ void NavEKF3_core::readIMUData()
         gyro_index_active = gyro_active;
     }
 
-        std::cout << "we got here3" << std::endl;
+        //std::cout << "we got here3" << std::endl;
 
 
     
@@ -450,7 +450,7 @@ void NavEKF3_core::readIMUData()
     // Get current time stamp
     imuDataNew.time_ms = imuSampleTime_ms;
 
-        std::cout << "we got here4" << std::endl;
+        //std::cout << "we got here4" << std::endl;
 
 
     
@@ -481,7 +481,7 @@ void NavEKF3_core::readIMUData()
     framesSincePredict++;
 
     
-    std::cout << "we got here6" << std::endl;
+    //std::cout << "we got here6" << std::endl;
 
 
     
@@ -496,22 +496,23 @@ void NavEKF3_core::readIMUData()
         (imuDataDownSampledNew.delAngDT >= 2.0f*EKF_TARGET_DT)) {
 
 
-        std::cout << "we got here7a" << std::endl;
-
-        // FOUND IT
+        //std::cout << "we got here7a" << std::endl;
 
         // convert the accumulated quaternion to an equivalent delta angle
         imuQuatDownSampleNew.to_axis_angle(imuDataDownSampledNew.delAng);
 
-        std::cout << "we got here9" << std::endl;
+        //std::cout << "we got here9" << std::endl;
 
         // Time stamp the data
         imuDataDownSampledNew.time_ms = imuSampleTime_ms;
 
+        //std::cout << "we got here10" << std::endl;
+
+        // FOUND IT
         // Write data to the FIFO IMU buffer
         storedIMU.push_youngest_element(imuDataDownSampledNew);
 
-        std::cout << "we got here8" << std::endl;
+        //std::cout << "we got here8" << std::endl;
 
         // calculate the achieved average time step rate for the EKF using a combination spike and LPF
         float dtNow = constrain_float(0.5f*(imuDataDownSampledNew.delAngDT+imuDataDownSampledNew.delVelDT),0.5f * dtEkfAvg, 2.0f * dtEkfAvg);
@@ -529,7 +530,7 @@ void NavEKF3_core::readIMUData()
         imuQuatDownSampleNew[3] = imuQuatDownSampleNew[2] = imuQuatDownSampleNew[1] = 0.0f;
 
 
-    std::cout << "we got here7" << std::endl;
+    //std::cout << "we got here7" << std::endl;
 
 
     
@@ -562,10 +563,10 @@ void NavEKF3_core::readIMUData()
         runUpdates = false;
 
 
-        std::cout << "we got here7b" << std::endl;
+        //std::cout << "we got here7b" << std::endl;
     }
 
-    std::cout << "we got here5" << std::endl;
+    //std::cout << "we got here5" << std::endl;
 
 
     

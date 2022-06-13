@@ -6,6 +6,9 @@
 
 #include "AP_DAL/AP_DAL.h"
 
+// DEBUG
+extern const AP_HAL::HAL& hal;
+
 // Control filter mode transitions
 void NavEKF3_core::controlFilterModes()
 {
@@ -154,14 +157,25 @@ void NavEKF3_core::setWindMagStateLearningMode()
     }
 
     if (tiltAlignComplete && inhibitDelAngBiasStates) {
+        hal.console->printf("Overwriting values\n");
         // activate the states
         inhibitDelAngBiasStates = false;
         updateStateIndexLim();
+
+        
 
         // set the initial covariance values
         P[10][10] = sq(radians(InitialGyroBiasUncertainty() * dtEkfAvg));
         P[11][11] = P[10][10];
         P[12][12] = P[10][10];
+
+        // DEBUG Transplant the covariance data
+        // if(!covarienceTransplanted) {
+        //     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
+        //     CovarianceTransplant();
+        //     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
+        //     covarienceTransplanted = true;
+        // }
     }
 
     // If on ground we clear the flag indicating that the magnetic field in-flight initialisation has been completed
@@ -485,6 +499,9 @@ bool NavEKF3_core::readyToUseGPS(void) const
         return false;
     }
 
+    // DEBUG
+    //hal.console->printf("%d, %d, %d, %d, %d, %d, %d\n", validOrigin, tiltAlignComplete, yawAlignComplete, delAngBiasLearned, assume_zero_sideslip(), gpsGoodToAlign, gpsDataToFuse);
+
     return validOrigin && tiltAlignComplete && yawAlignComplete && (delAngBiasLearned || assume_zero_sideslip()) && gpsGoodToAlign && gpsDataToFuse;
 }
 
@@ -608,6 +625,7 @@ void NavEKF3_core::checkGyroCalStatus(void)
         delAngBiasLearned = (fabsf(temp.x) < delAngBiasVarMax) &&
                             (fabsf(temp.y) < delAngBiasVarMax);
     } else {
+        //hal.console->printf("%.9g, %.9g, %.9g, %.9g\n", P[10][10], P[11][11], P[12][12], delAngBiasVarMax);
         delAngBiasLearned = (P[10][10] <= delAngBiasVarMax) &&
                             (P[11][11] <= delAngBiasVarMax) &&
                             (P[12][12] <= delAngBiasVarMax);

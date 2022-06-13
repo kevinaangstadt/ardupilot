@@ -777,6 +777,8 @@ bool NavEKF3::InitialiseFilter(void)
         // Call constructors on all cores
         for (uint8_t i = 0; i < num_cores; i++) {
             new (&core[i]) NavEKF3_core(this);
+            // DEBUG -> set core id number
+            core[i].ID = i;
         }
     }
 
@@ -2061,7 +2063,11 @@ void NavEKF3::dump_data(const GCS_MAVLINK& link, int32_t human_readable)
     for(int i = 0; i < num_cores; ++i) {
         NavEKF3_core &currCore = core[i];
         hal.console->printf("%d\n", i);
-        currCore.dump_core(link, human_readable);
+        //currCore.dump_core(link, human_readable);
+
+        // DEBUG -> doesn't work with transplant -> just using this function to get covarience for test
+        //hal.console->printf("dump cov: \n");
+        currCore.dump_covarience(link);
     }
 }
 

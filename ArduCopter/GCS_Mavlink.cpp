@@ -931,6 +931,19 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
         return MAV_RESULT_ACCEPTED;
     }
 
+    case MAV_CMD_REQUEST_MESSAGE:
+    {
+        // param1 : Message ID
+        int32_t param = static_cast<int32_t>(packet.param1);
+        int32_t human_readable = static_cast<int32_t>(packet.param2);
+        if (param == 5000000) {
+            // FIXME 
+            // no longer get_NavEKF3_const()
+            copter.ahrs.get_NavEKF3().dump_data(*this, human_readable);
+        }
+        return MAV_RESULT_ACCEPTED;
+    }
+
     default:
         return GCS_MAVLINK::handle_command_long_packet(packet);
     }
