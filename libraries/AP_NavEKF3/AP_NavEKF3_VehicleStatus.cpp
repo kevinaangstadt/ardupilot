@@ -293,10 +293,10 @@ void NavEKF3_core::calcGpsGoodForFlight(void)
 void NavEKF3_core::detectFlight()
 {
 
-    // DEBUG
-    inFlight = true;
-    onGround = false;
-    return;
+    // // DEBUG
+    // inFlight = true;
+    // onGround = false;
+    // return;
 
 
     /*

@@ -530,7 +530,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     // DEBUG
     //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
 
-    //CoreStateTransplant();
+    CoreStateTransplant();
 
     //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
 
@@ -539,44 +539,44 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     // DEBUG
     // replacing init code with hard coded values
 
-    // acceleration vector in XYZ body axes measured by the IMU (m/s^2)
-    Vector3f initAccVec;
+    // // acceleration vector in XYZ body axes measured by the IMU (m/s^2)
+    // Vector3f initAccVec;
 
-    // TODO we should average accel readings over several cycles
-    initAccVec = dal.ins().get_accel(accel_index_active);
+    // // TODO we should average accel readings over several cycles
+    // initAccVec = dal.ins().get_accel(accel_index_active);
 
-    // normalise the acceleration vector
-    float pitch=0, roll=0;
-    if (initAccVec.length() > 0.001f) {
-        initAccVec.normalize();
+    // // normalise the acceleration vector
+    // float pitch=0, roll=0;
+    // if (initAccVec.length() > 0.001f) {
+    //     initAccVec.normalize();
 
-        // calculate initial pitch angle
-        pitch = asinf(initAccVec.x);
+    //     // calculate initial pitch angle
+    //     pitch = asinf(initAccVec.x);
 
-        // calculate initial roll angle
-        roll = atan2f(-initAccVec.y , -initAccVec.z);
-    }
+    //     // calculate initial roll angle
+    //     roll = atan2f(-initAccVec.y , -initAccVec.z);
+    // }
 
-    // calculate initial roll and pitch orientation
-    stateStruct.quat.from_euler(roll, pitch, 0.0f);
+    // // calculate initial roll and pitch orientation
+    // stateStruct.quat.from_euler(roll, pitch, 0.0f);
 
-    // initialise dynamic states
-    stateStruct.velocity.zero();
-    stateStruct.position.zero();
+    // // initialise dynamic states
+    // stateStruct.velocity.zero();
+    // stateStruct.position.zero();
 
-    // initialise static process model states
-    stateStruct.gyro_bias.zero();
-    stateStruct.accel_bias.zero();
-    stateStruct.wind_vel.zero();
-    stateStruct.earth_magfield.zero();
-    stateStruct.body_magfield.zero();
+    // // initialise static process model states
+    // stateStruct.gyro_bias.zero();
+    // stateStruct.accel_bias.zero();
+    // stateStruct.wind_vel.zero();
+    // stateStruct.earth_magfield.zero();
+    // stateStruct.body_magfield.zero();
 
-    // set the position, velocity and height
-    ResetVelocity(resetDataSource::DEFAULT);
-    ResetPosition(resetDataSource::DEFAULT);
-    ResetHeight();
+    // // set the position, velocity and height
+    // ResetVelocity(resetDataSource::DEFAULT);
+    // ResetPosition(resetDataSource::DEFAULT);
+    // ResetHeight();
 
-    // *********************************88
+    // ***********************************
 
     // initialise sources
     posxy_source_last = frontend->sources.getPosXYSource();

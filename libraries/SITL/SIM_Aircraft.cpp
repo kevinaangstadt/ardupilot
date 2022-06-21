@@ -84,6 +84,9 @@ void Aircraft::set_start_location(const Location &start_loc, const float start_y
              home_yaw);
 
     location = home;
+
+    // DEBUG -> add to location.alt
+
     ground_level = home.alt * 0.01f;
 
     dcm.from_euler(0.0f, 0.0f, radians(home_yaw));
@@ -114,6 +117,9 @@ void Aircraft::set_precland(SIM_Precland *_precland) {
 */
 float Aircraft::hagl() const
 {
+    // DEBUG
+    //printf("hagl: %f\n", (-position.z) + home.alt * 0.01f - ground_level - frame_height - ground_height_difference());
+
     return (-position.z) + home.alt * 0.01f - ground_level - frame_height - ground_height_difference();
 }
 
@@ -122,6 +128,11 @@ float Aircraft::hagl() const
 */
 bool Aircraft::on_ground() const
 {
+    // DEBUG
+    // printf("on_ground: %s\n", (hagl() <= 0.001f)?"true":"false");
+    // if(hagl() <= 0.001f) {
+    //     while (true);
+    // }
     return hagl() <= 0.001f;  // prevent bouncing around ground
 }
 

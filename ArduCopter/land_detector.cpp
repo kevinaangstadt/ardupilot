@@ -1,10 +1,12 @@
 #include "Copter.h"
 
+// DEBUG
+#include <iostream>
+
 // Code to detect a crash main ArduCopter code
 #define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
 #define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
 #define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
-
 
 // counter to verify landings
 static uint32_t land_detector_count = 0;
@@ -52,6 +54,7 @@ void Copter::update_land_detector()
         // if throttle output is high then clear landing flag
         if (motors->get_throttle() > get_non_takeoff_throttle()) {
 #endif
+            std::cout << "set_land_complete(false)" << std::endl;
             set_land_complete(false);
         }
     } else if (standby_active) {
@@ -106,6 +109,10 @@ void Copter::set_land_complete(bool b)
     } else {
         AP::logger().Write_Event(LogEvent::NOT_LANDED);
     }
+
+    // DEBUG
+    //ap.land_complete = false;
+
     ap.land_complete = b;
 
 #if STATS_ENABLED == ENABLED

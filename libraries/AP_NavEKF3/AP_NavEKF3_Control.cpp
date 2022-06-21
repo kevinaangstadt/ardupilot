@@ -170,12 +170,12 @@ void NavEKF3_core::setWindMagStateLearningMode()
         P[12][12] = P[10][10];
 
         // DEBUG Transplant the covariance data
-        // if(!covarienceTransplanted) {
-        //     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
-        //     CovarianceTransplant();
-        //     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
-        //     covarienceTransplanted = true;
-        // }
+        if(!covarienceTransplanted) {
+            //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
+            CovarianceTransplant();
+            //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
+            covarienceTransplanted = true;
+        }
     }
 
     // If on ground we clear the flag indicating that the magnetic field in-flight initialisation has been completed
