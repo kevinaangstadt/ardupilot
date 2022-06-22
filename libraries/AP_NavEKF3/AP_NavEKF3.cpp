@@ -2069,6 +2069,8 @@ void NavEKF3::dump_data(const GCS_MAVLINK& link, int32_t human_readable)
         //hal.console->printf("dump cov: \n");
         currCore.dump_covarience(link);
     }
+
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "CORE DUMPED");
 }
 
 // DEBUG - insert new statesArray data into core
