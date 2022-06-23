@@ -707,6 +707,22 @@ NavEKF3::NavEKF3()
 // Initialise the filter
 bool NavEKF3::InitialiseFilter(void)
 {
+
+    // DEBUG
+    // // DEBUG
+    // // init load_data
+    // std::ifstream LoadData;
+
+    // LoadData.open("LoadData.txt", std::fstream::in); // opens the file
+    // grace = 1;
+    // if( LoadData && grace) {
+    //     load_data = true;
+    // } else {
+    //     load_data = false;
+    // }
+    // LoadData.close();
+
+
     if (_enable == 0 || _imuMask == 0) {
         return false;
     }
@@ -823,7 +839,7 @@ bool NavEKF3::InitialiseFilter(void)
     memset((void *)&pos_reset_data, 0, sizeof(pos_reset_data));
     memset(&pos_down_reset_data, 0, sizeof(pos_down_reset_data));
 
-    hal.console->printf("EKF Initialized: %d \n", ret);
+    //hal.console->printf("EKF Initialized: %d \n", ret);
 
     return ret;
 }

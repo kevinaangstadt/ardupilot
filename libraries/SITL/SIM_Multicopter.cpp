@@ -40,7 +40,7 @@ MultiCopter::MultiCopter(const char *frame_str) :
     ground_behavior = GROUND_BEHAVIOR_NO_MOVEMENT;
 
     // DEBUG
-    position.z = -1000;
+    //position.z = -1000;
     //printf("HERE IT IS: %f\n", position.z);
 }
 

@@ -442,6 +442,9 @@ public:
     //DEBUG
     void DumpCovarianceCore();
 
+    // DEBUG
+    bool load_data;
+
 private:
     EKFGSF_yaw *yawEstimator;
     AP_DAL &dal;

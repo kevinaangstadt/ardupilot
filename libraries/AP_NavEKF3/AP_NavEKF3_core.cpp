@@ -482,12 +482,15 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
 
     // DEBUG
-    // return false;
-
-    
-    //return true;
-
-
+    // init load_data
+    std::ifstream LoadData;
+    LoadData.open("LoadData.txt", std::fstream::in); // opens the file
+    if( LoadData ) {
+        load_data = true;
+    } else {
+        load_data = false;
+    }
+    LoadData.close();
 
     // update sensor selection (for affinity)
     update_sensor_selection();
@@ -527,56 +530,59 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     // set re-used variables to zero
     InitialiseVariables();
     
+
     // DEBUG
-    //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
+    // if load data is true then read state struct from a file. Otherwise init as usual.
+    if (load_data) {
+        //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
+        CoreStateTransplant();
+        hal.console->printf("Core State Transplanted\n");
+        //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
+    } else {
+        // ********************************************
+        // DEBUG
 
-    CoreStateTransplant();
+        // acceleration vector in XYZ body axes measured by the IMU (m/s^2)
+        Vector3f initAccVec;
 
-    //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
+        // TODO we should average accel readings over several cycles
+        initAccVec = dal.ins().get_accel(accel_index_active);
 
+        // normalise the acceleration vector
+        float pitch=0, roll=0;
+        if (initAccVec.length() > 0.001f) {
+            initAccVec.normalize();
 
-    // ********************************************
-    // DEBUG
-    // replacing init code with hard coded values
+            // calculate initial pitch angle
+            pitch = asinf(initAccVec.x);
 
-    // // acceleration vector in XYZ body axes measured by the IMU (m/s^2)
-    // Vector3f initAccVec;
+            // calculate initial roll angle
+            roll = atan2f(-initAccVec.y , -initAccVec.z);
+        }
 
-    // // TODO we should average accel readings over several cycles
-    // initAccVec = dal.ins().get_accel(accel_index_active);
+        // calculate initial roll and pitch orientation
+        stateStruct.quat.from_euler(roll, pitch, 0.0f);
 
-    // // normalise the acceleration vector
-    // float pitch=0, roll=0;
-    // if (initAccVec.length() > 0.001f) {
-    //     initAccVec.normalize();
+        // initialise dynamic states
+        stateStruct.velocity.zero();
+        stateStruct.position.zero();
 
-    //     // calculate initial pitch angle
-    //     pitch = asinf(initAccVec.x);
+        // initialise static process model states
+        stateStruct.gyro_bias.zero();
+        stateStruct.accel_bias.zero();
+        stateStruct.wind_vel.zero();
+        stateStruct.earth_magfield.zero();
+        stateStruct.body_magfield.zero();
 
-    //     // calculate initial roll angle
-    //     roll = atan2f(-initAccVec.y , -initAccVec.z);
-    // }
+        // set the position, velocity and height
+        ResetVelocity(resetDataSource::DEFAULT);
+        ResetPosition(resetDataSource::DEFAULT);
+        ResetHeight();
 
-    // // calculate initial roll and pitch orientation
-    // stateStruct.quat.from_euler(roll, pitch, 0.0f);
+        // ***********************************
 
-    // // initialise dynamic states
-    // stateStruct.velocity.zero();
-    // stateStruct.position.zero();
-
-    // // initialise static process model states
-    // stateStruct.gyro_bias.zero();
-    // stateStruct.accel_bias.zero();
-    // stateStruct.wind_vel.zero();
-    // stateStruct.earth_magfield.zero();
-    // stateStruct.body_magfield.zero();
-
-    // // set the position, velocity and height
-    // ResetVelocity(resetDataSource::DEFAULT);
-    // ResetPosition(resetDataSource::DEFAULT);
-    // ResetHeight();
-
-    // ***********************************
+        hal.console->printf("Core State Initialised\n");
+    }
 
     // initialise sources
     posxy_source_last = frontend->sources.getPosXYSource();
@@ -608,7 +614,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
 
 void NavEKF3_core::CoreStateTransplant()
 {
-    hal.console->printf("Transplanting core data!!!!!!!!!!!!!!!!!!!!!!\n");
+    //hal.console->printf("Transplanting core data!!!!!!!!!!!!!!!!!!!!!!\n");
     // Use hard-coded values
     // float tmp [] = {0.9987490177154541, -0.00011210364755243063, 0.0008885464048944414, -0.049996279180049896, -0.01660124398767948, 0.019848234951496124, 0.10715515911579132, -0.008682076819241047, 0.0104275643825531, 0.19717849791049957, 5.607244929706212e-06, 7.22184449841734e-06, -3.996879604528658e-05, -0.00010026794916484505, -0.00034329251502640545, -0.0009696076740510762, 0.22252412140369415, 0.04687904193997383, -0.5385611653327942, 0.0, 0.0, 0.0, 0.0, 0.0};
     // for(int i = 0; i < 24; ++i) {
@@ -641,7 +647,6 @@ void NavEKF3_core::CovarianceInit()
     memset(&P[0][0], 0, sizeof(P));
 
     // // DEBUG -> manually insert the covarience matrix to simulate transplanting it at boot
-    
 
     // Matrix24 tmp = {
     //     {6.59833e-07, -1.53017e-07, -1.68298e-07, 7.59451e-06, 3.15058e-07, -1.17174e-07, 5.20129e-07, 3.08697e-07, -1.2955e-07, -5.4166e-06, 6.81591e-12, 6.07952e-11, -1.1602e-08, 6.21058e-08, -5.28987e-08, -4.15205e-08, 0, 0, 0, 0, 0, 0, 0, 0},

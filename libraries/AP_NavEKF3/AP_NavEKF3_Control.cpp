@@ -157,7 +157,7 @@ void NavEKF3_core::setWindMagStateLearningMode()
     }
 
     if (tiltAlignComplete && inhibitDelAngBiasStates) {
-        hal.console->printf("Overwriting values\n");
+        
         // activate the states
         inhibitDelAngBiasStates = false;
         updateStateIndexLim();
@@ -170,7 +170,8 @@ void NavEKF3_core::setWindMagStateLearningMode()
         P[12][12] = P[10][10];
 
         // DEBUG Transplant the covariance data
-        if(!covarienceTransplanted) {
+        if(load_data && !covarienceTransplanted) {
+            hal.console->printf("Overwriting Covariance Matrix\n");
             //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
             CovarianceTransplant();
             //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");

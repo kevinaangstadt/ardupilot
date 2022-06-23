@@ -86,6 +86,7 @@ void Aircraft::set_start_location(const Location &start_loc, const float start_y
     location = home;
 
     // DEBUG -> add to location.alt
+    //location.alt += 1000;
 
     ground_level = home.alt * 0.01f;
 
@@ -141,6 +142,8 @@ bool Aircraft::on_ground() const
 */
 void Aircraft::update_position(void)
 {
+    // DEBUG **
+    //         StartigPos -> init as home.alt + 10
     location = home;
     location.offset(position.x, position.y);
 
