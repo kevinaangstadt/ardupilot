@@ -171,8 +171,8 @@ void NavEKF3_core::setWindMagStateLearningMode()
 
         // DEBUG Transplant the covariance data
         if(load_data && !covarienceTransplanted) {
-            hal.console->printf("Overwriting Covariance Matrix\n");
-            //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
+            //hal.console->printf("Overwriting Covariance Matrix\n");
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Overwriting Covariance Matrix");
             CovarianceTransplant();
             //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
             covarienceTransplanted = true;

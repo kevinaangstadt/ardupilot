@@ -536,9 +536,9 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     if (load_data) {
         //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
         CoreStateTransplant();
-        hal.console->printf("Core State Transplanted\n");
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Core State Transplanted_");
-        std::cout << "_Core State Transplanted" << std::endl;
+        //hal.console->printf("Core State Transplanted\n");
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Core State Transplanted");
+        //std::cout << "_Core State Transplanted" << std::endl;
     } else {
         // ********************************************
         // DEBUG
@@ -582,7 +582,8 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
 
         // ***********************************
 
-        hal.console->printf("Core State Initialised\n");
+        //hal.console->printf("Core State Initialised\n");
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Core State Initialised");
     }
 
     // initialise sources
