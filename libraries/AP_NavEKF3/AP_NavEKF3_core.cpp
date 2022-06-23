@@ -537,7 +537,8 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
         //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "BEFORE STATE TRANSPLANT");
         CoreStateTransplant();
         hal.console->printf("Core State Transplanted\n");
-        //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AFTER STATE TRANSPLANT");
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Core State Transplanted_");
+        std::cout << "_Core State Transplanted" << std::endl;
     } else {
         // ********************************************
         // DEBUG
