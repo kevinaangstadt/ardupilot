@@ -420,6 +420,18 @@ private:
     static_assert(_failsafe_priorities[ARRAY_SIZE(_failsafe_priorities) - 1] == -1,
                   "_failsafe_priorities is missing the sentinel");
 
+    
+    // DEBUG TIMING
+    bool timing_data_sent = false;
+    void check_pos_ok() {
+        if(!timing_data_sent) {
+            if (ekf_position_ok()) {
+                timing_data_sent = true;
+                gcs().send_text(MAV_SEVERITY_NOTICE, "Timing Position Aquired");
+            }
+        }
+    }
+
 
 public:
     void failsafe_check();

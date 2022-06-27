@@ -107,6 +107,8 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
     SCHED_TASK(afs_fs_check,           10,    200),
 #endif
     SCHED_TASK(read_airspeed,          10,    100),
+    // DEBUG
+    SCHED_TASK(check_pos_ok,           10,    100),
 };
 
 
