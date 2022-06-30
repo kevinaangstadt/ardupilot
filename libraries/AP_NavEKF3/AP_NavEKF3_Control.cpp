@@ -8,6 +8,7 @@
 
 // DEBUG
 extern const AP_HAL::HAL& hal;
+#include <iostream>
 
 // Control filter mode transitions
 void NavEKF3_core::controlFilterModes()
@@ -667,6 +668,9 @@ void  NavEKF3_core::updateFilterStatus(void)
     filterStatus.flags.gps_glitching = !gpsAccuracyGood && (PV_AidingMode == AID_ABSOLUTE) && (frontend->sources.getPosXYSource() == AP_NavEKF_Source::SourceXY::GPS); // GPS glitching is affecting navigation accuracy
     filterStatus.flags.gps_quality_good = gpsGoodToAlign;
     filterStatus.flags.initalized = filterStatus.flags.initalized || healthy();
+
+    // DEBUG
+    std::cout << filterStatus.value << std::endl;
 }
 
 void NavEKF3_core::runYawEstimatorPrediction()
