@@ -4,26 +4,45 @@
 #include "AP_NavEKF3_core.h"
 #include <AP_DAL/AP_DAL.h>
 
+// DEBUG
+#include <iostream>
+
 // Check basic filter health metrics and return a consolidated health status
 bool NavEKF3_core::healthy(void) const
 {
     uint16_t faultInt;
     getFilterFaults(faultInt);
     if (faultInt > 0) {
+
+        // DEBUG
+        std::cout << "first fail" << std::endl;
+
         return false;
     }
     if (velTestRatio > 1 && posTestRatio > 1 && hgtTestRatio > 1) {
         // all three metrics being above 1 means the filter is
         // extremely unhealthy.
+
+        // DEBUG
+        std::cout << "second fail" << std::endl;
+
         return false;
     }
     // Give the filter a second to settle before use
     if ((imuSampleTime_ms - ekfStartTime_ms) < 1000 ) {
+
+        // DEBUG
+        std::cout << "third fail" << std::endl;
+
         return false;
     }
     // position and height innovations must be within limits when on-ground and in a static mode of operation
     float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
     if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsf(hgtInnovFiltState) > 1.0f))) {
+
+        // DEUBG
+        std::cout << "fourth fail" << std::endl;
+
         return false;
     }
 

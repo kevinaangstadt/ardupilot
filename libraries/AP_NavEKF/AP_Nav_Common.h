@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+// 0b10000000010100101
+// 0b11010001100111111
 union nav_filter_status {
     struct {
         bool attitude           : 1; // 0 - true if attitude estimate is valid
