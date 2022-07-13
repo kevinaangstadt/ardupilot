@@ -1,8 +1,12 @@
 #include "Copter.h"
 
+// DEBUG
+#include <iostream>
+
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
 {
+    // DEBUG
     motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     set_land_complete(false);
@@ -10,6 +14,8 @@ void Copter::userhook_init()
     attitude_control->set_throttle_out(0.5f,
                                        true,
                                        g.throttle_filt);
+
+    std::cout << "in usercode.cpp" << std::endl;
 }
 #endif
 
