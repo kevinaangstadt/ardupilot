@@ -3,8 +3,13 @@
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
 {
-    // put your initialisation code here
-    // this will be called once at start-up
+    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+
+    set_land_complete(false);
+
+    attitude_control->set_throttle_out(0.5f,
+                                       true,
+                                       g.throttle_filt);
 }
 #endif
 

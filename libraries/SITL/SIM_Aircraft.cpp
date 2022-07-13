@@ -143,7 +143,7 @@ bool Aircraft::on_ground() const
 void Aircraft::update_position(void)
 {
     // DEBUG **
-    //         StartigPos -> init as home.alt + 10
+    //         StartingPos -> init as home.alt + 10
     location = home;
     location.offset(position.x, position.y);
 
