@@ -51,6 +51,17 @@ void Copter::userhook_SlowLoop()
 void Copter::userhook_SuperSlowLoop()
 {
     // put your 1Hz code here
+
+    // DEBUG
+    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+
+    set_land_complete(false);
+
+    attitude_control->set_throttle_out(0.5f,
+                                       true,
+                                       g.throttle_filt);
+
+    std::cout << "in usercode.cpp" << std::endl;
 }
 #endif
 
