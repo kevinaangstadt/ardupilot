@@ -670,7 +670,7 @@ void  NavEKF3_core::updateFilterStatus(void)
     filterStatus.flags.initalized = filterStatus.flags.initalized || healthy();
 
     // DEBUG
-    std::cout << filterStatus.value << std::endl;
+    //std::cout << filterStatus.value << std::endl;
 }
 
 void NavEKF3_core::runYawEstimatorPrediction()
