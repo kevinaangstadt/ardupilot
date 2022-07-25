@@ -36,16 +36,19 @@ bool NavEKF3_core::healthy(void) const
 
         return false;
     }
-    // position and height innovations must be within limits when on-ground and in a static mode of operation
-    float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
-    if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsf(hgtInnovFiltState) > 1.0f))) {
+    // DEBUG -> added the check for skip_checks
+    if ( !skip_checks ) {
+        // position and height innovations must be within limits when on-ground and in a static mode of operation
+        float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
+        if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsf(hgtInnovFiltState) > 1.0f))) {
 
-        // DEUBG
-        std::cout << "fourth fail" << std::endl;
+            // DEUBG
+            std::cout << "fourth fail" << std::endl;
+            std::cout << horizErrSq << "    " << fabsf(hgtInnovFiltState) << std::endl;
 
-        return false;
+            return false;
+        }
     }
-
     // all OK
     return true;
 }
