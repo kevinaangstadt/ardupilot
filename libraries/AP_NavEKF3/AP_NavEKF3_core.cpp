@@ -480,6 +480,16 @@ after the tilt has stabilised.
 
 bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
+    // DEBUG
+    // init skip_checks
+    std::ifstream SkipChecks;
+    SkipChecks.open("SkipChecks.txt", std::fstream::in); // opens the file
+    if( SkipChecks ) {
+        skip_checks = true;
+    } else {
+        skip_checks = false;
+    }
+    SkipChecks.close();
 
     // DEBUG
     // init load_data
@@ -487,8 +497,10 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     LoadData.open("LoadData.txt", std::fstream::in); // opens the file
     if( LoadData ) {
         load_data = true;
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Load data set to true");
     } else {
         load_data = false;
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Load data set to false");
     }
     LoadData.close();
 
@@ -640,6 +652,8 @@ void NavEKF3_core::CoreStateTransplant()
     }
 
     CoreData.close();
+
+    std::cout << "Core Transplanted" << std::endl;
 }
 
 // initialise the covariance matrix
@@ -795,6 +809,8 @@ void NavEKF3_core::CovarianceTransplant()
     }  
 
     CovarianceData.close();
+
+    std::cout << "Covariance Transplanted" << std::endl;
 }
 
 //DEBUG

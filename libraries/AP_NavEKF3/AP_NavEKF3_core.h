@@ -445,6 +445,9 @@ public:
     // DEBUG
     bool load_data;
 
+    // DEBUG
+    bool skip_checks = false;
+
 private:
     EKFGSF_yaw *yawEstimator;
     AP_DAL &dal;

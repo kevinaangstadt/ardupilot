@@ -7,15 +7,24 @@
 void Copter::userhook_init()
 {
     // DEBUG
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    set_land_complete(false);
+    // This arms the motors if they are not already
+    if (!motors->armed()) {
+        init_rc_out();
+        enable_motor_output();
+        motors->armed(true);
+        hal.util->set_soft_armed(true);
+    }
 
-    attitude_control->set_throttle_out(0.5f,
-                                       true,
-                                       g.throttle_filt);
+//     motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    std::cout << "in usercode.cpp" << std::endl;
+//     set_land_complete(false);
+
+//     attitude_control->set_throttle_out(0.5f,
+//                                        true,
+//                                        g.throttle_filt);
+
+//     std::cout << "in usercode.cpp" << std::endl;
 }
 #endif
 
@@ -53,15 +62,26 @@ void Copter::userhook_SuperSlowLoop()
     // put your 1Hz code here
 
     // DEBUG
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    set_land_complete(false);
 
-    attitude_control->set_throttle_out(0.5f,
-                                       true,
-                                       g.throttle_filt);
+    // This arms the motors if they are not already
+    // if (!motors->armed()) {
+    //     init_rc_out();
+    //     enable_motor_output();
+    //     motors->armed(true);
+    //     hal.util->set_soft_armed(true);
+    // }
 
-    std::cout << "in usercode.cpp" << std::endl;
+
+    // motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+
+    // set_land_complete(false);
+
+    // attitude_control->set_throttle_out(0.5f,
+    //                                    true,
+    //                                    g.throttle_filt);
+
+    // std::cout << "in usercode slowloop" << std::endl;
 }
 #endif
 
