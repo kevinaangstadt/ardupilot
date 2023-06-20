@@ -497,8 +497,10 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     LoadData.open("LoadData.txt", std::fstream::in); // opens the file
     if( LoadData ) {
         load_data = true;
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Load data set to true");
     } else {
         load_data = false;
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Load data set to false");
     }
     LoadData.close();
 

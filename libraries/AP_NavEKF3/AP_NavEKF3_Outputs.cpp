@@ -15,7 +15,7 @@ bool NavEKF3_core::healthy(void) const
     if (faultInt > 0) {
 
         // DEBUG
-        std::cout << "first fail" << std::endl;
+        //std::cout << "first fail" << std::endl;
 
         return false;
     }
@@ -24,7 +24,7 @@ bool NavEKF3_core::healthy(void) const
         // extremely unhealthy.
 
         // DEBUG
-        std::cout << "second fail" << std::endl;
+        //std::cout << "second fail" << std::endl;
 
         return false;
     }
@@ -32,7 +32,7 @@ bool NavEKF3_core::healthy(void) const
     if ((imuSampleTime_ms - ekfStartTime_ms) < 1000 ) {
 
         // DEBUG
-        std::cout << "third fail" << std::endl;
+        //std::cout << "third fail" << std::endl;
 
         return false;
     }
@@ -43,8 +43,8 @@ bool NavEKF3_core::healthy(void) const
         if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsf(hgtInnovFiltState) > 1.0f))) {
 
             // DEUBG
-            std::cout << "fourth fail" << std::endl;
-            std::cout << horizErrSq << "    " << fabsf(hgtInnovFiltState) << std::endl;
+            //std::cout << "fourth fail" << std::endl;
+            //std::cout << horizErrSq << "    " << fabsf(hgtInnovFiltState) << std::endl;
 
             return false;
         }
