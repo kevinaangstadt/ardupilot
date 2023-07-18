@@ -202,6 +202,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if STATS_ENABLED == ENABLED
     SCHED_TASK_CLASS(AP_Stats,             &copter.g2.stats,            update,           1, 100),
 #endif
+SCHED_TASK(check_pos_ok,           10,    100),
 };
 
 void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,

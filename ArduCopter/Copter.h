@@ -892,6 +892,18 @@ private:
     bool get_wp_bearing_deg(float &bearing) const override;
     bool get_wp_crosstrack_error_m(float &xtrack_error) const override;
 
+    //send a message when we are able to arm/switch modes
+    bool timing_data_sent = false;
+    void check_pos_ok(){
+        if (!timing_data_sent){
+            if(position_ok()){
+            timing_data_sent = true;
+            gcs().send_text(MAV_SEVERITY_NOTICE, "Timing Position Acquired");
+        }
+    }
+}
+
+
     Mode *flightmode;
 #if MODE_ACRO_ENABLED == ENABLED
 #if FRAME_CONFIG == HELI_FRAME
