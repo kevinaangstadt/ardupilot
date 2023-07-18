@@ -898,7 +898,7 @@ private:
         if (!timing_data_sent){
             if(position_ok()){
             timing_data_sent = true;
-            gcs().send_text(MAV_SEVERITY_NOTICE, "Timing Position Acquired");
+            gcs().send_text(MAV_SEVERITY_NOTICE, "Timing Position Aquired");
         }
     }
 }
