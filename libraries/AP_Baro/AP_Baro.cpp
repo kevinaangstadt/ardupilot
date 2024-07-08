@@ -21,6 +21,8 @@
 
 #include <utility>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
 
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Common/AP_Common.h>
@@ -867,7 +869,17 @@ void AP_Baro::update(void)
             if (!is_positive(ground_pressure) || isnan(ground_pressure) || isinf(ground_pressure)) {
                 sensors[i].ground_pressure.set(sensors[i].pressure);
             }
+
             float altitude = sensors[i].altitude;
+
+                std::ifstream initAirFile;
+    
+
+
+
+
+
+            //std::cout << "hhhhhhhhhhhhhh" << std::endl;
             float corrected_pressure = sensors[i].pressure + sensors[i].p_correction;
             if (sensors[i].type == BARO_TYPE_AIR) {
 #if HAL_BARO_WIND_COMP_ENABLED

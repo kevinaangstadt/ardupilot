@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <iostream>
+#include <fstream>
 
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
@@ -73,8 +75,15 @@ Aircraft::Aircraft(const char *frame_str) :
 void Aircraft::set_start_location(const Location &start_loc, const float start_yaw)
 {
     home = start_loc;
+    Location newLoc;
+    newLoc.alt = 13000;
+    newLoc.lat = start_loc.lat;
+    newLoc.lng = start_loc.lng;
     origin = home;
+    //std::cout << "origin alt" << origin.alt << std::endl;
+    //std::cout << "home alt" << home.alt << std::endl;
     position.xy().zero();
+
     home_yaw = start_yaw;
     home_is_set = true;
 
@@ -86,6 +95,9 @@ void Aircraft::set_start_location(const Location &start_loc, const float start_y
 
     location = home;
     ground_level = home.alt * 0.01f;
+    // if the file is found and it hasn't already been found, set on_ground to false and subtract 150 from position.z
+    // if done_beofre && and file does not exit, reset done_before so we can do it multiple times without
+    // restarting simulation
 
 #if 0
     // useful test for home position being very different from origin
@@ -125,6 +137,14 @@ void Aircraft::set_precland(SIM_Precland *_precland) {
 */
 float Aircraft::hagl() const
 {
+    //std::cout << "z" << position.z << std::endl;
+    //std::cout << "home.alt" << home.alt << std::endl;
+    //std::cout << "ground level" << ground_level << std::endl;
+    //std::cout << "ground height diff" << ground_height_difference() << std::endl;
+    //std::cout << "frame_height" << frame_height << std::endl;
+
+
+
     return (-position.z) + home.alt * 0.01f - ground_level - frame_height - ground_height_difference();
 }
 
@@ -133,6 +153,7 @@ float Aircraft::hagl() const
 */
 bool Aircraft::on_ground() const
 {
+    
     return hagl() <= 0.001f;  // prevent bouncing around ground
 }
 
@@ -141,11 +162,17 @@ bool Aircraft::on_ground() const
 */
 void Aircraft::update_position(void)
 {
+    
+    // dont change altitude when we change position.z, possibly look at gps.
+
+
+    //std::cout << origin.alt << std::endl;
+    //std::cout << home.alt <<std::endl;
     location = origin;
     location.offset(position.x, position.y);
 
     location.alt  = static_cast<int32_t>(home.alt - position.z * 100.0f);
-
+    //std::cout << position.x << ":" << position.y << ":" << position.z << std::endl;
 #if 0
     Vector3d pos_home = position;
     pos_home.xy() += home.get_distance_NE_double(origin);
@@ -619,6 +646,44 @@ void Aircraft::update_model(const struct sitl_input &input)
  */
 void Aircraft::update_dynamics(const Vector3f &rot_accel)
 {
+
+    // Peyton - checking to see if there is a load data file. If there is one, we want to put the copter in
+    // the air using position.z. If we have already done this once but the file has been deleted, reset
+    // doneBefore so we can do it again without restarting simulation. To do this, do touch initAir.txt in ArudCopter directory
+    
+    std::ifstream initAirFile;
+    initAirFile.open("initAir.txt", std::ifstream::in);
+    //std::cout << doneBefore << std::endl;
+    if (initAirFile.is_open()){
+        initAir = true;
+    }
+    else{
+        initAir = false;
+    }
+    //std::cout << initAir << std::endl;
+    if (initAir && !doneBefore) {
+        std::cout << "alskjdf;klasjkld" << std::endl;
+        position.z -= 8;
+        doneBefore = true;
+    }
+    else if(!initAir && doneBefore){
+        doneBefore = false;
+    }
+    else if(initAir && doneBefore) {
+        //std::cout << "hhhhhhhhhhhh" << std::endl;
+        initAirFile.close();
+        return;
+    }
+
+    initAirFile.close();
+
+
+
+
+
+
+
+
     // update eas2tas and air density
 #if AP_AHRS_ENABLED
     eas2tas = AP::ahrs().get_EAS2TAS();
@@ -679,11 +744,12 @@ void Aircraft::update_dynamics(const Vector3f &rot_accel)
 
     // constrain height to the ground
     if (on_ground()) {
+        //std::cout << "on ground" << was_on_ground << std::endl;
         if (!was_on_ground && AP_HAL::millis() - last_ground_contact_ms > 1000) {
             GCS_SEND_TEXT(MAV_SEVERITY_INFO, "SIM Hit ground at %f m/s", velocity_ef.z);
             last_ground_contact_ms = AP_HAL::millis();
         }
-        position.z = -(ground_level + frame_height - home.alt * 0.01f + ground_height_difference());
+        position.z = -(ground_level + frame_height - home.alt * 0.01f + ground_height_difference()) ;
 
         // get speed of ground movement (for ship takeoff/landing)
         float yaw_rate = 0;

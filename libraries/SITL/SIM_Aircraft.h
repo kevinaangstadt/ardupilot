@@ -173,6 +173,8 @@ protected:
     Location home;
     bool home_is_set;
     Location location;
+    bool doneBefore = false;
+    bool initAir = false;
 
     float ground_level;
     float home_yaw;
@@ -368,3 +370,4 @@ private:
 } // namespace SITL
 
 #endif // AP_SIM_ENABLED
+

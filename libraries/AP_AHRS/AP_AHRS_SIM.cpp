@@ -3,6 +3,7 @@
 #if AP_AHRS_SIM_ENABLED
 
 #include "AP_AHRS.h"
+#include <iostream>
 
 bool AP_AHRS_SIM::get_location(Location &loc) const
 {
@@ -96,7 +97,7 @@ bool AP_AHRS_SIM::get_hagl(float &height) const
     if (_sitl == nullptr) {
         return false;
     }
-
+    std::cout << "hhhhhhhhhhhhhhhhhhhhh" << std::endl;
     height = _sitl->state.altitude - AP::ahrs().get_home().alt*0.01f;
 
     return true;

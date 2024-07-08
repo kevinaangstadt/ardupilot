@@ -55,6 +55,7 @@ void MultiCopter::calculate_forces(const struct sitl_input &input, Vector3f &rot
  */
 void MultiCopter::update(const struct sitl_input &input)
 {
+    
     // get wind vector setup
     update_wind(input);
 

@@ -410,7 +410,7 @@ void GPS::update()
     Vector3f glitch_offsets = _sitl->gps_glitch[idx];
     d.latitude += glitch_offsets.x;
     d.longitude += glitch_offsets.y;
-    d.altitude += glitch_offsets.z;
+    //d.altitude += glitch_offsets.z;
 
         if (_sitl->gps_jam[idx] == 1) {
             simulate_jamming(d);

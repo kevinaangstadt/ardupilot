@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <iostream>
 
 #include <AP_Param/AP_Param.h>
 #include <SITL/SIM_JSBSim.h>
@@ -71,7 +72,8 @@ void SITL_State::_sitl_setup()
     _parent_pid = getppid();
 #endif
 
-    fprintf(stdout, "Starting SITL input\n");
+    //fprintf(stdout, "Starting SITL input\n");
+    //fprintf(stdout, "hello\n");
 
     // find the barometer object if it exists
     _sitl = AP::sitl();
@@ -475,7 +477,6 @@ void SITL_State::init(int argc, char * const argv[])
 void SITL_State::set_height_agl(void)
 {
     static float home_alt = -1;
-
     if (!_sitl) {
         // in example program
         return;
@@ -483,12 +484,18 @@ void SITL_State::set_height_agl(void)
 
     if (is_equal(home_alt, -1.0f) && _sitl->state.altitude > 0) {
         // remember home altitude as first non-zero altitude
-        home_alt = _sitl->state.altitude;
+        home_alt = 0;//_sitl->state.altitude;
+        // set home_alt to 0 because we want the environment to think the ground is below 
+        //state.altitude (number passed in to the command line that starts the simulation)
     }
 
 #if AP_TERRAIN_AVAILABLE
     if (_sitl != nullptr &&
         _sitl->terrain_enable) {
+            float tehalt = _sitl-> state.altitude;
+            std::cout << home_alt << std::endl;
+            std::cout << tehalt << std::endl;
+            
         // get height above terrain from AP_Terrain. This assumes
         // AP_Terrain is working
         float terrain_height_amsl;
@@ -499,7 +506,11 @@ void SITL_State::set_height_agl(void)
         AP_Terrain *_terrain = AP_Terrain::get_singleton();
         if (_terrain != nullptr &&
             _terrain->height_amsl(location, terrain_height_amsl, false)) {
+                //fprintf(stdout, "helloooooooo\n");
+                //std::cout << terrain_height_amsl << std::endl;
+                //std::cout << "yes" << _sitl -> state.altitude << std::endl;
             _sitl->state.height_agl = _sitl->state.altitude - terrain_height_amsl;
+                //std::cout << "yes" << _sitl->state.height_agl << std::endl;
             return;
         }
     }
@@ -507,7 +518,16 @@ void SITL_State::set_height_agl(void)
 
     if (_sitl != nullptr) {
         // fall back to flat earth model
+        //fprintf(stdout, "helloooooooo\n");
+        //std::cout << "state.altitude: "<< _sitl -> state.altitude << std::endl;
+        //std::cout << "home_alt: " << home_alt << std::endl;
         _sitl->state.height_agl = _sitl->state.altitude - home_alt;
+        // height_agl is now equal to state altitude so now the environment thinks the
+        // copter is above the ground.  Copter does not think its off the ground yet.
+        // Look at landing mode and how the copter knows its on the ground. verify it is looking at the copter falling and then not.
+        // Copter thinks it has landed because it should be going down but it isn't anymore.
+        // Find where simulator ways you can't go down anymore.
+        //std::cout << "height_agl: " <<_sitl->state.height_agl << std::endl;
     }
 }
 

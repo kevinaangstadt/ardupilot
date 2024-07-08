@@ -23,6 +23,8 @@
 
 #if AP_AHRS_ENABLED
 
+#include <iostream>
+
 #include <AP_HAL/AP_HAL.h>
 #include "AP_AHRS.h"
 #include "AP_AHRS_View.h"
@@ -1615,24 +1617,29 @@ bool AP_AHRS::get_hagl(float &height) const
     switch (active_EKF_type()) {
 #if AP_AHRS_DCM_ENABLED
     case EKFType::DCM:
+        //std::cout << "1111" << std::endl;
         return false;
 #endif
 #if HAL_NAVEKF2_AVAILABLE
     case EKFType::TWO:
+    //std::cout << "2222" << std::endl;
         return EKF2.getHAGL(height);
 #endif
 
 #if HAL_NAVEKF3_AVAILABLE
     case EKFType::THREE:
+        //std::cout << "3333" << std::endl;
         return EKF3.getHAGL(height);
 #endif
 
 #if AP_AHRS_SIM_ENABLED
     case EKFType::SIM:
+        //std::cout << "4444" << std::endl;
         return sim.get_hagl(height);
 #endif
 #if AP_AHRS_EXTERNAL_ENABLED
     case EKFType::EXTERNAL: {
+        //std::cout << "5555" << std::endl;
         return false;
     }
 #endif
@@ -1810,6 +1817,7 @@ void AP_AHRS::get_relative_position_D_home(float &posD) const
     if (!_home_is_set) {
         // fall back to an altitude derived from barometric pressure
         // differences vs a calibrated ground pressure:
+        //std::cout << "11111111111" << std::endl;
         posD = -AP::baro().get_altitude();
         return;
     }
@@ -1823,6 +1831,7 @@ void AP_AHRS::get_relative_position_D_home(float &posD) const
         if (_gps_use == GPSUse::EnableWithHeight &&
             gps.status() >= AP_GPS::GPS_OK_FIX_3D) {
             posD = (_home.alt - gps.location().alt) * 0.01;
+            std::cout << "22222222222" << std::endl;
             return;
         }
 #endif

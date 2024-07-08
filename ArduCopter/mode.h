@@ -107,6 +107,8 @@ public:
     // do not allow copying
     CLASS_NO_COPY(Mode);
 
+    bool initAir = false;
+
     friend class _AutoTakeoff;
 
     // returns a unique number specific to this mode

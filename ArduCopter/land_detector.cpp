@@ -1,6 +1,7 @@
 #include "Copter.h"
 
 #include <AP_Stats/AP_Stats.h>              // statistics library
+#include <iostream>
 
 // Code to detect a crash main ArduCopter code
 #define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing

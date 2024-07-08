@@ -56,7 +56,7 @@ struct sitl_fdm {
     uint64_t timestamp_us;
     Location home;
     double latitude, longitude; // degrees
-    double altitude;  // MSL
+    double altitude = 200;  // MSL
     double heading;   // degrees
     double speedN, speedE, speedD; // m/s
     double xAccel, yAccel, zAccel;       // m/s/s in body frame

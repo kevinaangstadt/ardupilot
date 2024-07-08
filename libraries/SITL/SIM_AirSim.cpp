@@ -16,6 +16,8 @@
 	Simulator Connector for AirSim
 */
 
+#include<iostream>
+
 #include "SIM_AirSim.h"
 
 #if HAL_SIM_AIRSIM_ENABLED
@@ -46,6 +48,7 @@ AirSim::AirSim(const char *frame_str) :
         // default to copter
         output_type = OutputType::Copter;
     }
+
 
 	printf("Starting SITL Airsim type %u\n", (unsigned)output_type);
 }

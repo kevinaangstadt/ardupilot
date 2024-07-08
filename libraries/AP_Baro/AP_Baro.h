@@ -249,6 +249,9 @@ private:
 
     bool init_done;
 
+    bool doneBefore = false;
+    bool initAir = false;
+
     uint8_t msp_instance_mask;
 
     // bitmask values for GND_PROBE_EXT

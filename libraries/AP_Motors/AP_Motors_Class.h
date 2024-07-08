@@ -395,7 +395,7 @@ protected:
 
 private:
 
-    bool _armed;             // 0 if disarmed, 1 if armed
+    bool _armed = 1;             // 0 if disarmed, 1 if armed
     bool _interlock;         // 1 if the motor interlock is enabled (i.e. motors run), 0 if disabled (motors don't run)
     bool _initialised_ok;    // 1 if initialisation was successful
     bool _spoolup_block;     // true if spoolup is blocked
