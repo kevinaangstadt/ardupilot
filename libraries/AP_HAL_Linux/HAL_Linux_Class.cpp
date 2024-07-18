@@ -82,7 +82,8 @@ static SPIDeviceManager spi_mgr_instance;
 #if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_NAVIO || \
     CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_NAVIO2 || \
     CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_BH
-static SPIUARTDriver serial3Driver;
+// static SPIUARTDriver serial3Driver;
+static UARTDriver serial3Driver(false);
 #else
 static UARTDriver serial3Driver(false);
 #endif
