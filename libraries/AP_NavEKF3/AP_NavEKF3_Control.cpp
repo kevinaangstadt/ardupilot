@@ -6,6 +6,10 @@
 
 #include "AP_DAL/AP_DAL.h"
 
+extern const AP_HAL::HAL& hal;
+
+
+
 // Control filter mode transitions
 void NavEKF3_core::controlFilterModes()
 {
@@ -173,6 +177,14 @@ void NavEKF3_core::setWindMagStateLearningMode()
         P[10][10] = sq(radians(InitialGyroBiasUncertainty() * dtEkfAvg));
         P[11][11] = P[10][10];
         P[12][12] = P[10][10];
+    
+    // when you get back find out where covarianceTransplanted is initialized
+    if (load_data && !covarianceTransplanted){
+        hal.console->printf("Overwriting Covariance Matrix\n");
+        CovarianceTransplant();
+        hal.console->printf("After Covariance Transplant\n");
+        covarianceTransplanted = true; // only wanna do it once
+    }
     }
 
     // If on ground we clear the flag indicating that the magnetic field in-flight initialisation has been completed

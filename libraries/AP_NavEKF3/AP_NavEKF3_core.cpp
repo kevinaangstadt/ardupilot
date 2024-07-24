@@ -7,6 +7,12 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_DAL/AP_DAL.h>
 
+#include <fstream>
+#include <iostream>
+#include <cstring>
+
+extern const AP_HAL::HAL& hal;
+
 // constructor
 NavEKF3_core::NavEKF3_core(NavEKF3 *_frontend) :
     frontend(_frontend),
@@ -24,6 +30,8 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     gyro_index_active = imu_index;
     accel_index_active = imu_index;
     core_index = _core_index;
+
+    covarianceTransplanted = false;
 
     /*
       The imu_buffer_length needs to cope with the worst case sensor delay at the
@@ -453,6 +461,18 @@ after the tilt has stabilised.
 
 bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
+    //hal.console->printf("ooooooooooooooo\n");
+    std::ifstream LoadData;
+    LoadData.open("LoadData.txt", std::fstream::in);
+    if (LoadData) {
+        load_data = true;
+    }else{
+        load_data = false;
+    }
+    //bool transplant = true;
+    LoadData.close();
+
+
     // update sensor selection (for affinity)
     update_sensor_selection();
 
@@ -489,6 +509,13 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
 
     // set re-used variables to zero
     InitialiseVariables();
+
+    //std::cout << covarianceTransplanted << std::endl;
+    if (load_data) { // should be load_data //TODO
+        CoreStateTransplant();
+        //std::cout << "dskfjkdljsklj" << std::endl;
+        hal.console->printf("Core State Transplanted\n");
+    } else{
 
     // acceleration vector in XYZ body axes measured by the IMU (m/s^2)
     Vector3F initAccVec;
@@ -527,6 +554,11 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     ResetPosition(resetDataSource::DEFAULT);
     ResetHeight();
 
+
+// end if
+    hal.console->printf("Corse State Initialised\n");
+    }    
+
     // initialise sources
     posxy_source_last = frontend->sources.getPosXYSource();
     yaw_source_last = frontend->sources.getYawSource();
@@ -554,6 +586,131 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     // we initially return false to wait for the IMU buffer to fill
     return false;
 }
+
+void NavEKF3_core::CoreStateTransplant(){
+    
+    // transplants the core from a file when the computer is initiated
+    std::ifstream CoreData;
+    CoreData.open("CoreData" + std::to_string(ID) + ".bin",
+    std::fstream::in | std::fstream::binary);
+    std::cout << std::to_string(ID) << std::endl;
+
+    if (!CoreData) {
+        // file cant be opened
+        hal.console->printf("ERROR: could not open file\n");
+    }
+
+    // read each value in and transplant them into the array
+    double next_value;
+    for (int j = 0; j < 24; j++) { //24
+        CoreData.read(reinterpret_cast<char*>(&next_value), sizeof(double));
+        statesArray[j] = next_value;
+        }
+    CoreData.close();
+}
+
+void NavEKF3_core::CovarianceTransplant(){
+    // Transplant from the stored data when starting up computer
+    std::ifstream CovarianceData;
+
+    //open the file
+    CovarianceData.open("CovarianceData" + std::to_string(ID) + ".bin", std::fstream::in | std::fstream::binary); // opens the binary file
+    if( !CovarianceData ) { // file couldn't be opened
+        hal.console->printf("ERROR: could not open file\n");
+        return;
+    }
+    // read through the file and assign to the covariance matrix
+    // format of the file is P[1][1], P[1][2], ... , P[2][1], P[2][2], ...(no commas)
+    // has to be double and 8 bytes because thats how we wrote it
+    double next_value;
+    for (int i = 0; i< 24; ++i) {
+        for (int j = 0; j < 24; ++j) {
+            CovarianceData.read(reinterpret_cast<char*>(&next_value), 8);
+            P[i][j] = next_value;
+
+        }    
+    }              
+
+    CovarianceData.close();
+
+    hal.console->printf("Covariance transplanted");
+
+}
+
+
+void NavEKF3_core::DumpCovarianceCore()
+{
+    // when we recieve the mavlink message, we want to output the core and covariance
+    // data into files. 
+    std::ofstream CoreData;
+    std::ofstream CovarianceData;
+    hal.console->printf("In the function\n");
+    CoreData.open("CoreData" + std::to_string(ID) + ".bin", std::fstream::binary); // opens the binary file
+    CovarianceData.open("CovarianceData" + std::to_string(ID) + ".bin", std::fstream::binary); // opens the binary file
+    if( !CoreData || !CovarianceData ) { // file couldn't be opened
+        hal.console->printf("ERROR: could not open file\n");
+        return;
+    }
+    // 24 values of 8 bytes each that we write to the file
+    for (int i=0; i<24; ++i) {
+        CoreData.write(reinterpret_cast<const char*>(&(statesArray[i])), sizeof(statesArray[i]));
+        // hal.console->printf("size of states %lu\n", sizeof(statesArray[i]));
+        // hal.console->printf("%d: %f\n", i, statesArray[i]);
+        // hal.console->printf("size of float %lu\n", sizeof(float));
+        // hal.console->printf("size of double %lu\n", sizeof(double));
+    } // 8 bytes each
+    for (int i=0; i<24; ++i) {
+        for (int j=0; j<24; ++j) {
+            CovarianceData.write(reinterpret_cast<const char*>(&(P[i][j])), sizeof(P[i][j]));
+        }   
+    }
+    CoreData.close();
+    CovarianceData.close();
+}
+
+// this one does not actually save the values to a file. This is supposed to dump it
+// to the screen but it doesn't work very well. For debugging.
+void NavEKF3_core::dump_core(const GCS_MAVLINK& link, int32_t human_readable)
+{
+    const mavlink_channel_t chan = link.get_chan();
+    if (human_readable) {
+        // Vector24
+        for (int j = 0; j < 24; ++j) {
+            hal.console->printf("-------");
+            hal.console->printf("%f", statesArray[j]);
+        }
+    } else {
+        union
+        {
+            float input;
+            int32_t output;
+        } data;
+        float *data_tmp = new float[58];
+        memcpy(data_tmp, statesArray, sizeof(float)*24);
+        hal.console->printf("+");
+        hal.console->printf("%f" , data_tmp[0]);
+        hal.console->printf("-");
+        hal.console->printf("%f" , statesArray[0]);
+	mavlink_msg_debug_float_array_send(chan,10,"datadatad", 0, data_tmp);
+        delete[] data_tmp;
+        for (int j = 0; j < 24; ++j) {
+            data.input = statesArray[j];
+	    // GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "%d", data.output );
+            
+            for (size_t part = 0; part < sizeof(float); ++part){
+                hal.console->printf("*");
+                hal.console->printf("%c" , data.output >> part);
+            }
+        }
+        
+    }
+    hal.console->printf("d;flajdklfjlka;sjd\n");
+}
+
+
+
+
+
 
 // initialise the covariance matrix
 void NavEKF3_core::CovarianceInit()
@@ -2217,4 +2374,17 @@ void NavEKF3_core::moveEKFOrigin(void)
     for (unsigned index=0; index < imu_buffer_length; index++) {
         storedOutput[index].position.xy() += diffNE;
     }
+}
+
+void NavEKF3_core::write_core(float data[24]){
+    for (int i = 0; i < 24; i++){
+        statesArray[i] = data[i];
+        hal.console->printf("%d: %f\n", i, statesArray[i]);
+    }
+    statesInitialised = true;
+    hal.console->printf("\n");
+}
+
+void NavEKF3_core::dump_covariance(const GCS_MAVLINK& link){
+    DumpCovarianceCore();
 }
