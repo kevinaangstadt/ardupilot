@@ -229,6 +229,8 @@ public:
     friend class PayloadPlace;
 
     Copter(void);
+    
+    void set_land_status(bool b) { set_land_complete(b); }
 
 private:
 
