@@ -252,6 +252,7 @@ public:
     virtual float       get_pitch_factor(uint8_t i) { return 0.0f; }
 
     // return whether a motor is enabled or not
+    // this as well
     virtual bool        is_motor_enabled(uint8_t i) { return false; }
 
     // This function required for tradheli. Tradheli initializes targets when going from unarmed to armed state.
@@ -270,6 +271,7 @@ public:
     MAV_TYPE get_frame_mav_type() const { return _mav_type; }
 
     // direct motor write
+    //look at this
     virtual void        rc_write(uint8_t chan, uint16_t pwm);
 
 #if AP_SCRIPTING_ENABLED

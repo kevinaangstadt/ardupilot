@@ -37,7 +37,7 @@ bool ModeBrake::init(bool ignore_checks)
 void ModeBrake::run()
 {
     // if not armed set throttle to zero and exit immediately
-
+    //std::cout << (int) copter.ap.land_complete << std::endl;
     std::ifstream initAirFile;
     initAirFile.open("initAir.txt", std::ifstream::in);
     //std::cout << doneBefore << std::endl;
@@ -51,13 +51,13 @@ void ModeBrake::run()
 
     if (initAir) {
         //std::cout << "oooooooo" << std::endl;
-        copter.set_land_complete(false);
+        //copter.set_land_complete(false);
     }
 
     //std::cout << copter.
-
-    if (is_disarmed_or_landed() && !initAir) {
-        std::cout << "yes" << std::endl;
+    //std::cout << (int) copter.ap.land_complete << std::endl;
+    if (is_disarmed_or_landed()) { // this may or may not be is_disarmed_or_landed && !initAir
+       // std::cout << "yes" << std::endl;
         make_safe_ground_handling();
         pos_control->relax_z_controller(0.0f);
         return;
