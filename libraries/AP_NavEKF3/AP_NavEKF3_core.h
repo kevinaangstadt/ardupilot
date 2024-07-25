@@ -445,6 +445,38 @@ public:
 
     void Log_Write(uint64_t time_us);
 
+
+// DEBUG - dump covarience matrix to the console and send via mavlink
+    void dump_covariance(const GCS_MAVLINK&);
+
+    // DEBUG - dump statesArray to the console and send via mavlink
+    void dump_core(const GCS_MAVLINK&, int32_t);
+
+    // DEBUG - insert new statesArray data into core
+    void write_core(float[24]);
+
+    // DEBUG
+    bool covarianceTransplanted;
+
+    bool doneBefore = false;
+
+    // DEBUG
+    // transplant the covariance matrix
+    void CovarianceTransplant();
+
+    // DEBUG
+    void CoreStateTransplant();
+
+    void DumpCovarianceCore();
+
+    bool load_data;
+
+    uint8_t ID;
+
+    bool skip_checks = false;
+
+
+
     // returns true when the state estimates are significantly degraded by vibration
     bool isVibrationAffected() const { return badIMUdata; }
 

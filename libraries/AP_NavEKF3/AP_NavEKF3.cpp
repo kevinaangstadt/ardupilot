@@ -10,6 +10,8 @@
 
 #include <new>
 
+extern const AP_HAL::HAL& hal;
+
 /*
   parameter defaults for different types of vehicle. The
   APM_BUILD_DIRECTORY is taken from the main vehicle directory name
@@ -826,6 +828,7 @@ bool NavEKF3::InitialiseFilter(void)
         // Call constructors on all cores
         for (uint8_t i = 0; i < num_cores; i++) {
             new (&core[i]) NavEKF3_core(this);
+            core[i].ID = i;
         }
     }
 
@@ -2051,6 +2054,29 @@ void NavEKF3::writeDefaultAirSpeed(float airspeed, float uncertainty)
         }
     }
 }
+void NavEKF3::dump_data(const GCS_MAVLINK& link, int32_t human_readable)
+{
+    hal.console->printf("dump: \n");
+    const mavlink_channel_t chan = link.get_chan();
+    mavlink_msg_debug_vect_send(chan, "datadatad", 0, num_cores, 0, 0);
+    for(int i = 0; i < num_cores; ++i) {
+        NavEKF3_core &currCore = core[i];
+        hal.console->printf("%d\n", i);
+        //currCore.dump_core(link, human_readable);
+
+        // DEBUG -> doesn't work with transplant -> just using this function to get covarience for test
+        //hal.console->printf("dump cov: \n");
+        currCore.dump_covariance(link);
+    }
+
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "CORE DUMPED");
+}
+void NavEKF3::write_core(int id, float data[24]){
+    hal.console->printf("%d\n", id);
+    core[id].write_core(data);
+}
+
+
 
 // returns true when the yaw angle has been aligned
 bool NavEKF3::yawAlignmentComplete(void) const

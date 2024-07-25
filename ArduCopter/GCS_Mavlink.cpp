@@ -792,6 +792,17 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
     case MAV_CMD_NAV_TAKEOFF:
     case MAV_CMD_NAV_VTOL_TAKEOFF:
         return handle_MAV_CMD_NAV_TAKEOFF(packet);
+    
+    case MAV_CMD_REQUEST_MESSAGE:
+    {
+        // param1 : Message ID
+        int32_t param = static_cast<int32_t>(packet.param1);
+        int32_t human_readable = static_cast<int32_t>(packet.param2);
+        if(param == 5000000) {
+            copter.ahrs.get_NavEKF3().dump_data(*this, human_readable);
+        }
+    return MAV_RESULT_ACCEPTED;
+    }
 
 #if PARACHUTE == ENABLED
     case MAV_CMD_DO_PARACHUTE:
@@ -1484,6 +1495,9 @@ void GCS_MAVLINK_Copter::handle_message(const mavlink_message_t &msg)
 {
 
     switch (msg.msgid) {
+    case MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY:
+        handle_debug_float_array(msg);
+        break;
 #if MODE_GUIDED_ENABLED == ENABLED
     case MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:
         handle_message_set_attitude_target(msg);
@@ -1511,6 +1525,26 @@ void GCS_MAVLINK_Copter::handle_message(const mavlink_message_t &msg)
         break;
     }
 }
+
+void GCS_MAVLINK_Copter::handle_debug_float_array(const mavlink_message_t &msg)
+{
+    mavlink_debug_float_array_t packet;
+    mavlink_msg_debug_float_array_decode(&msg, &packet);
+
+    int32_t id = packet.array_id;
+    //float* data[58] = {packet.data}; // I don't get pointers
+
+    float statesArray[24];
+
+    for(int i = 0; i < 24; i++) {
+        statesArray[i] = packet.data[i]; // I still don't get pointers...
+    }
+
+    copter.ahrs.get_NavEKF3().write_core(id, statesArray);
+
+    hal.console->printf("YAY!\n");
+}
+
 
 MAV_RESULT GCS_MAVLINK_Copter::handle_flight_termination(const mavlink_command_int_t &packet) {
 #if ADVANCED_FAILSAFE == ENABLED

@@ -27,6 +27,7 @@
 
 class NavEKF3_core;
 class EKFGSF_yaw;
+class GCS_MAVLINK;
 
 class NavEKF3 {
     friend class NavEKF3_core;
@@ -364,6 +365,10 @@ public:
 
     // get a yaw estimator instance
     const EKFGSF_yaw *get_yawEstimator(void) const;
+
+    void dump_data(const GCS_MAVLINK&, int32_t);
+
+    void write_core(int id, float[24]);
 
 private:
     uint8_t num_cores; // number of allocated cores
