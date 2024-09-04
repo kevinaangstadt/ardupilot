@@ -513,7 +513,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     InitialiseVariables();
 
 //std::cout << covarianceTransplanted << std::endl;
-    if (load_data) { // should be load_data //TODO
+    if (frontend -> _load_data) { // should be load_data //TODO
         CoreStateTransplant();
         //std::cout << "dskfjkdljsklj" << std::endl;
         hal.console->printf("Core State Transplanted\n");

@@ -651,6 +651,8 @@ const AP_Param::GroupInfo NavEKF3::var_info[] = {
 
     AP_SUBGROUPEXTENSION("", 63, NavEKF3, var_info2),
 
+    //AP_GROUPINFO("tplant", 64, NavEKF3, _load_data, 0),
+
     AP_GROUPEND
 };
 
@@ -742,6 +744,8 @@ const AP_Param::GroupInfo NavEKF3::var_info2[] = {
     // @Bitmask: 0:JammingExpected
     // @User: Advanced
     AP_GROUPINFO("OPTIONS",  11, NavEKF3, _options, 0),
+
+    AP_GROUPINFO("TPLANT", 12, NavEKF3, _load_data, 0),
 
     AP_GROUPEND
 };
