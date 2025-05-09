@@ -973,6 +973,19 @@ private:
     void userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag);
 
+    
+       //send a message when we are able to arm/switch modes
+    bool timing_data_sent = false;
+    void check_pos_ok(){
+        if (!timing_data_sent){
+            if(position_ok()){
+            timing_data_sent = true;
+            gcs().send_text(MAV_SEVERITY_NOTICE, "Timing Position Acquired");
+        }
+    }
+}
+
+
 #if MODE_ACRO_ENABLED == ENABLED
 #if FRAME_CONFIG == HELI_FRAME
     ModeAcro_Heli mode_acro;

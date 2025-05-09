@@ -34,7 +34,7 @@
 #include <AP_Common/ExpandingString.h>
 #include <AP_HAL/SIMState.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-
+#include <iostream>
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
 #endif
@@ -143,6 +143,7 @@ void AP_Scheduler::init(const AP_Scheduler::Task *tasks, uint8_t num_tasks, uint
     uint8_t old = 0;
     for (uint8_t i=0; i<_num_common_tasks; i++) {
         if (_common_tasks[i].priority < old){
+		std::cout  << "FIRSt" << std::endl;
             INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
             break;
         }
@@ -151,6 +152,10 @@ void AP_Scheduler::init(const AP_Scheduler::Task *tasks, uint8_t num_tasks, uint
     old = 0;
     for (uint8_t i=0; i<_num_vehicle_tasks; i++) {
         if (_vehicle_tasks[i].priority < old) {
+		std::cout << "SECOND" << std::endl;
+		std::cout << "Flow of control error: task " << i
+              << ", priority " << _vehicle_tasks[i].priority
+              << ", old " << old << std::endl;
             INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
             break;
         }
